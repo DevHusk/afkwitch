@@ -7,7 +7,7 @@ from playwright.sync_api import sync_playwright
 
 app = Flask(__name__)
 
-AFK_URL = os.environ.get("AFK_URL", "https://dash.witchly.host/afk")
+AFK_URL = os.environ.get("AFK_URL", "https://dash.witchly.host/earn/afk")
 COOKIES_JSON = os.environ.get("COOKIES_JSON", "[]")
 
 def run_browser():
@@ -47,21 +47,16 @@ def run_browser():
                 context.add_cookies(formatted_cookies)
                 page = context.new_page()
 
-                # RAM bachane ke liye images/CSS/fonts block
-                page.route(
-                    "**/*",
-                    lambda route: route.abort()
-                    if route.request.resource_type in ["image", "stylesheet", "font", "media"]
-                    else route.continue_()
-                )
-
                 print(f"Opening {AFK_URL}...", flush=True)
                 page.goto(AFK_URL, wait_until="domcontentloaded", timeout=60000)
-                print("AFK Page Loaded! Title:", page.title(), flush=True)
+                time.sleep(10)
+
+                print("Current URL:", page.url, flush=True)
+                print("Page Text:\n", page.inner_text("body")[:600], flush=True)
 
                 while True:
                     time.sleep(60)
-                    print("Still AFK...", flush=True)
+                    print("Still AFK | URL:", page.url, flush=True)
 
         except Exception as e:
             print("Error:", e, flush=True)
